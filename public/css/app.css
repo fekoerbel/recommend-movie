@@ -2108,6 +2108,10 @@ input:invalid, textarea:invalid, select:invalid {
   color: #db2777;
 }
 
+body {
+  background: #333;
+}
+
 main {
   background: #333;
 }

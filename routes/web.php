@@ -56,4 +56,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', LogoutController::class)
         ->name('logout');
+
+    Route::get('my-account', [App\Http\Controllers\UserController::class, 'index'])
+    ->name('my-account');
+    Route::get('deleteMovie', [App\Http\Controllers\UserController::class, 'delete'])
+    ->name('delMovie');
 });

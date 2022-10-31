@@ -20,7 +20,7 @@ class MovieController extends Controller
         }
 
     /**
-     * Show the application home.
+     * Show the application movies.
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
