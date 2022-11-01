@@ -59,6 +59,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('my-account', [App\Http\Controllers\UserController::class, 'index'])
     ->name('my-account');
-    Route::get('deleteMovie', [App\Http\Controllers\UserController::class, 'delete'])
+
+    Route::post('endMovie', [App\Http\Controllers\UserController::class, 'endMovie'])
+    ->name('endMovie');
+
+    Route::post('delMovie', [App\Http\Controllers\UserController::class, 'delMovie'])
     ->name('delMovie');
 });

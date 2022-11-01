@@ -27,10 +27,8 @@ class HomeController extends Controller
     public function index()
     {
         $data = new \stdClass();
-        $data->movies = Movies::whereNull('ended_at')->get();
+        $data->movies = Movies::all();
         
-        
-
         return view('dashboard', compact('data'));
     }
 

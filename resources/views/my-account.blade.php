@@ -1,48 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
-<header class="border-bottom bg-light">
-    <div class="container py-4">
-        <div class="row">
-            <div class="col-12 text-end">
-                @if (Route::has('login'))
-                <div class="space-x-4">
-                    @auth
-                    <a href="{{ route('my-account') }}" class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">
-                        Minha conta
-                    </a>
-                    <a href="{{ route('logout') }}"
-                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                        class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">
-                        Sair
-                    </a>
 
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                    @else
-                    <a href="{{ route('login') }}"
-                        class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">Entrar</a>
-
-                    @if (Route::has('register'))
-                    <a href="{{ route('register') }}"
-                        class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">Registrar</a>
-                    @endif
-                    @endauth
-                </div>
-                @endif
-            </div>
-        </div>
-    </div>
-</header>
 <main>
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <h2>
-                    Meus filmes
+                <h2 class="text-white fs-2 py-3">
+                    Bem vindo(a), <br> {{ $data->name }}
                 </h2>
+                <h3 class="text-white fs-1 text-center py-3">
+                    Meus filmes
+                </h3>
             </div>
+            @if (count($data->movies) < 0)
             @foreach ($data->movies as $movie)
             <div class="col-md-4">
                 <div class="card">
@@ -63,15 +34,38 @@
                         <p>
                             Não recomendado por: {{$movie->notRecommended}} pessoas
                         </p>
-                        <button type="button" class="btn btn-danger my-1"
-                            onclick="confirmDelete({{$movie->id}})">Apagar recomendação</button>
+                        @if ($movie->ended_at)
+                        <p>
+                            Encerrado em: {{ $movie->ended_at }}
+                        </p>
+                        @endIf
+                        <div class="text-center">
+                            <button type="button" class="btn btn-warning my-1 w-100"
+                                onclick="confirmEndMovie({{$movie->id}})">Encerrar recomendação
+                            </button>
+                            <button type="button" class="btn btn-danger my-1 w-100"
+                            onclick="confirmDelMovie({{$movie->id}})">
+                                Deletar recomendação
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
             @endforeach
+            @else
+            <div class="col-12 py-5">
+                <h3 class="text-white text-center fs-3 text-decoration-underline">
+                    Nenhum filme para exibir
+                </h3>
+            </div>
+            @endIf
+            <form action="{{route('endMovie')}}" id="end-movie" method="POST">
+                @csrf
+                <input type="hidden" name="id" id="input-end-movie" value="">
+            </form>
             <form action="{{route('delMovie')}}" id="del-movie" method="POST">
                 @csrf
-                <input type="hidden" name="id" id="input-recommend" value="">
+                <input type="hidden" name="id" id="input-del-movie" value="">
             </form>
         </div>
     </div>
@@ -83,8 +77,27 @@
 @endsection
 @section('js-scripts')
 <script>
-        function confirmDelete() {
+    function confirmEndMovie(movieId) {
+        var form = document.getElementById('end-movie')
+        var id = document.getElementById('input-end-movie')
+        Swal.fire({
+            title: 'Deseja encerrar este pedido de recomendação?',
+            showCancelButton: true,
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#dc3545',
+            confirmButtonText: 'Sim',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.value) {
+                id.value = movieId
+                form.submit()
+            }
+        })
+    }
+
+    function confirmDelMovie(movieId) {
         var form = document.getElementById('del-movie')
+        var id = document.getElementById('input-del-movie')
         Swal.fire({
             title: 'Deseja apagar este pedido de recomendação?',
             showCancelButton: true,
@@ -94,6 +107,7 @@
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.value) {
+                id.value = movieId
                 form.submit()
             }
         })

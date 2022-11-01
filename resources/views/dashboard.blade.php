@@ -1,39 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<header class="border-bottom bg-light">
-    <div class="container py-4">
-        <div class="row">
-            <div class="col-12 text-end">
-                @if (Route::has('login'))
-                <div class="space-x-4">
-                    @auth
-                    <a href="{{ route('my-account') }}" class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">
-                        Minha conta
-                    </a>
-                    <a href="{{ route('logout') }}"
-                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                        class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">
-                        Sair
-                    </a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                    @else
-                    <a href="{{ route('login') }}"
-                        class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">Entrar</a>
 
-                    @if (Route::has('register'))
-                    <a href="{{ route('register') }}"
-                        class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">Registrar</a>
-                    @endif
-                    @endauth
-                </div>
-                @endif
-            </div>
-        </div>
-    </div>
-</header>
 
 <main>
     <div class="container">
@@ -43,39 +11,52 @@
                     Você recomenda?
                 </h1>
             </div>
+            @if (count($data->movies) > 0)
             @foreach ($data->movies as $movie)
             <div class="col-md-4">
                 <div class="card">
                     <img src={{!empty($movie->image) ? $movie->image :
                     'https://via.placeholder.com/400x400.png?text=Imagem+n%C3%A3o+dispon%C3%ADvel' }}
-                    class="card-img-top img-fluid" alt={{$movie->name}}>
+                    class="card-img-top img-fluid" height="400" width="400" alt="{{ $movie->name }}">
                     <div class="card-body">
-                        <h2 class="card-title fw-bold">{{$movie->name}}</h2>
+                        <h2 class="card-title fw-bold">{{ $movie->name }}</h2>
                         <p>
-                            Ano de lançamento: {{$movie->year}}
+                            Ano de lançamento: {{ $movie->year }}
                         </p>
                         <p>
-                            Gênero: {{$movie->genre}}
+                            Gênero: {{ $movie->genre }}
                         </p>
                         <p>
-                            Recomendado por: {{$movie->recommended}} pessoas
+                            Recomendado por: {{ $movie->recommended }} pessoas
                         </p>
                         <p>
-                            Não recomendado por: {{$movie->notRecommended}} pessoas
+                            Não recomendado por: {{ $movie->notRecommended }} pessoas
                         </p>
+                        @if ($movie->ended_at)
+                        <p>
+                            Encerrado em: {{ date('d-m-Y', strtotime($movie->ended_at)) }}
+                        </p>
+                        @endIf
                         <button type="button" class="btn btn-success my-1"
-                            onclick="confirmRecommend({{$movie->id}})">Recomendar</button>
+                            onclick="confirmRecommend({{ $movie->id }})">Recomendar</button>
 
-                        <button type="button" class="btn btn-danger my-1" onclick="confirmNotRecommend({{$movie->id}})">Não recomendar</button>
+                        <button type="button" class="btn btn-danger my-1" onclick="confirmNotRecommend({{ $movie->id }})">Não recomendar</button>
                     </div>
                 </div>
             </div>
             @endforeach
-            <form action="{{route('recommendMovie')}}" id="recommend-movie" method="POST">
+            @else
+            <div class="col-12 py-5">
+                <h3 class="text-white text-center fs-3 text-decoration-underline">
+                    Nenhum filme para exibir
+                </h3>
+            </div>
+            @endIf
+            <form action="{{ route('recommendMovie') }}" id="recommend-movie" method="POST">
                 @csrf
                 <input type="hidden" name="id" id="input-recommend" value="">
             </form>
-            <form action="{{route('notRecommendMovie')}}" id="not-recommend-movie" method="POST">
+            <form action="{{ route('notRecommendMovie') }}" id="not-recommend-movie" method="POST">
                 @csrf
                 <input type="hidden" name="id" id="input-not-recommend" value="">
             </form>

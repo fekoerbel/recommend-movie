@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Movies;
 use Carbon\Carbon;
 use Auth;
+use Alert;
 
 class UserController extends Controller
 {
@@ -27,16 +28,31 @@ class UserController extends Controller
     public function index()
     {
         $data = Auth::user();
-        $data->movies = Movies::where('users_id', Auth::user()->id)->whereNotNull('ended_at')->get();
-
+        $data->movies = Movies::where('users_id', Auth::user()->id)->get();
+        
         return view('my-account', compact('data'));
     }
 
-    public function delete()
+    public function endMovie(Request $request)
     {
-        // TO DO
+        $data = Movies::find($request->id);
+            $data->ended_at = Carbon::now();
+            $data->save();
+        
+        return redirect()->back();
+    }
 
-        return view('my-account', compact('data'));
+    public function delMovie(Request $request)
+    {
+        $data = Movies::find($request->id);
+        if ($data->recommended || $data->notRecommended) {
+            Alert::toast('Você não pode deletar um filme com recomendações.', 'error');
+        } else {
+            $data->ended_at = Carbon::now();
+            $data->delete();
+        }
+
+        return redirect()->back();
     }
 
     /**
